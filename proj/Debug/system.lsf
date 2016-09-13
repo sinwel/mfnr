@@ -1,0 +1,140 @@
+
+
+classes:
+;code 						[c:0000, 		 c:7fff] 		 internal
+
+data_int_b0 			[d:18000,  d:27fff] internal	; 64k
+data_int_b1 			[d:28000,  d:37fff] internal	; 64k
+data_int_b2 			[d:38000,  d:47fff] internal	; 64k
+data_int_b3 			[d:48000,  d:57fff] internal	; 64k
+
+
+code_ddr_init   	[C:12010000, C:12011bff] external
+code_sys_boot   	[C:60000400, C:60001fff] external
+code_ddr_resume 	[C:60002000, C:60003bff] external
+;code_ddr_conver 	[C:60004000, C:60005bff] external
+code_sys_ex 			[C:60030000, C:6004ffff] external
+
+data_ddr_init    	[D:12011c00, D:12011fff] external
+data_ddr_resume 	[D:60003c00, D:60003fff] external
+;data_ddr_conver 	[D:60005c00, D:60005fff] external
+data_sys_ex 			[D:60050000, D:6005ffff] external
+
+code_mfnr_ex 			[C:60400000, C:6044ffff] external ;320KB
+code_sys 					[C:60440000, C:6044ffff] external ;320KB
+data_mfnr_ex 			[D:60450000, D:604fffff] external ;704KB
+data_mfnr_ex_raw 	[D:60500000, D:67ffffff] external ;113MB
+
+;data_wdr_ex_table	[]; 24x961x2B
+
+;
+;data_mfnr_int_dsp   [D:18000,  D:37fff] internal ;128KB
+
+;data_wdr_int_b0 [d:38000,  d:381ff] internal;
+;data_wdr_int_b1 [d:38200,  d:385ff] internal;
+
+
+code:
+segment 0
+inttbl  
+call_saved_store_restore_sect   lo 
+ 
+ctor_sect   
+crtn_ctor_sect  
+dtor_sect   
+crtn_dtor_sect
+code_sys:
+.text   lo
+code_ddr_init:
+{
+code_ddr_init_start_sect lo align 0x100
+code_ddr_resume_start_sect lo align 0x100 noload
+}
+{
+code_ddr_init_sect lo align 0x100
+code_ddr_resume_sect lo align 0x100 noload
+}
+
+code_sys_boot:
+code_sys_boot_start_sect
+code_sys_boot_sect
+
+code_ddr_resume:
+code_ddr_resume_start_clone_sect lo align 0x100 clone code_ddr_resume_start_sect
+code_ddr_resume_clone_sect lo align 0x100 clone code_ddr_resume_sect
+
+
+;code_ddr_conver:
+;code_ddr_conver_sect lo
+
+code_sys_ex:
+code_sys_ex_sect lo
+
+code_mfnr_ex:
+code_mfnr_ex_sect lo
+
+
+data:
+segment 0
+dummy_sect  lo size 0x1000
+.data   lo align 0x4
+const_data  lo align 0x4
+.bss    lo align 0x4
+.no_init    lo align 0x4
+ARG_SECT    lo align 0x4
+ARG_SECT_END    at next noload
+data_clone  lo align 0x4 clone .data
+const_data_clone    lo align 0x4 clone const_data
+ctors   align 0x4
+dtors   align 0x4
+
+__STACK_SECT    at 0x3c000 size 0x4000  noload
+
+data_ddr_init:
+{
+data_ddr_init_sect lo
+data_ddr_resume_sect lo noload
+}
+
+data_ddr_resume:
+data_ddr_resume_clone_sect lo clone data_ddr_resume_sect
+
+
+;data_ddr_conver:
+;data_ddr_conver_sect
+
+data_sys_ex:
+data_sys_ex_start_sect
+data_sys_ex_sect lo align 0x20
+data_sys_ex_no_load_sect noload lo align 0x20
+
+
+data_mfnr_ex:
+data_mfnr_ex_sect
+
+data_mfnr_ex_raw:
+data_mfnr_ex_raw_sect lo noload
+
+
+data_mfnr_int_dsp:
+data_mfnr_int_dsp_sect
+
+;data_wdr_int_b0:
+;data_wdr_int_b0_sect
+
+;data_wdr_int_b1:
+;data_wdr_int_b1_sect
+
+data_int_b0:
+data_int_b0_sect
+
+data_int_b1:  
+data_int_b1_sect   
+                                          
+data_int_b2: 
+data_int_b2_sect  
+                                          
+data_int_b3:                                            
+data_int_b3_sect align 0x40  
+
+
